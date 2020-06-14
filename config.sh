@@ -1,13 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-: ${blog_title:="BLASH blog"}
-: ${default_author:="John Doe"}
+set -o errexit  # stop on error
+set -o pipefail # stop on stupid 
+
+# DEBUGGING:
+# set -o xtrace 
+
+: ${blog_title:="tregeagle v9.4"}
+: ${default_author:="Ruben Hillier"}
 : ${base_url:=""}
 
-configureAssets () {
-  for css in assets/css/*.css
-  do
-    filename=$(basename -- "$css")
-    cp "$css" "publish/assets/css/$filename"
-  done
+configureAssets () {  
+mkdir -p contents/assets
+cp -r contents/assets publish/
 }

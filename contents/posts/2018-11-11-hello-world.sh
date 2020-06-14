@@ -1,6 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -o errexit  # stop on error
+set -o pipefail # stop on stupid 
+
+# DEBUGGING:
+# set -o xtrace 
 
 title="Hello, world!"
-categories=("foo" "bar")
-tags=("bash" "intro" "post" "static")
-excerpt="Foo bar baz!"
+tags=("ta" "gs")
+excerpt="H l o, w r d!"

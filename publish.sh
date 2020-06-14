@@ -1,4 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -o errexit  # stop on error
+set -o pipefail # stop on stupid 
+
+# DEBUGGING:
+# set -o xtrace 
+
 
 #------------------------------------------------------------------------------#
 #                     BLASH - Bash static blog generator                       #
@@ -6,11 +13,11 @@
 #                Released under the ISC license - see LICENSE                  #
 #------------------------------------------------------------------------------#
 
-htmlEscape () {
+_htmlEscape() {
   sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g' <<< "$1"
 }
 
-fileNameToUrl() {
+_fileNameToUrl() {
   # File format: YYYY-mm-dd-foo-bar-baz
   local year=${1:0:4}
   local month=${1:5:2}
@@ -22,7 +29,6 @@ fileNameToUrl() {
 
 mkdir -p publish/posts
 mkdir -p publish/posts/tags
-mkdir -p publish/posts/categories
 mkdir -p publish/assets/js
 mkdir -p publish/assets/css
 mkdir -p publish/assets/images
@@ -34,11 +40,10 @@ configureAssets
 declare -a posts
 posts=()
 
-declare -A titles dates excerpts all_categories all_tags posts_by_year posts_by_month posts_by_day
+declare -A titles dates excerpts all_tags posts_by_year posts_by_month posts_by_day
 titles=()
 dates=()
 excerpts=()
-all_categories=()
 all_tags=()
 posts_by_year=()
 posts_by_month=()
@@ -65,20 +70,19 @@ do
 
   title=""
   author=$default_author
-  categories=("misc")
   tags=()
   draft=false
   excerpt=""
   source "$post"
-  title=$(htmlEscape "$title")
-  author=$(htmlEscape "$author")
-  excerpt=$(htmlEscape "$excerpt")
+  title=$(_htmlEscape "$title")
+  author=$(_htmlEscape "$author")
+  excerpt=$(_htmlEscape "$excerpt")
 
   date=${filename:0:10}
   content=$(pandoc "contents/posts/$filename.md")
   source "templates/post.sh"
 
-  path=$(fileNameToUrl "$filename")
+  path=$(_fileNameToUrl "$filename")
   mkdir -p "publish/${path%/*}"
   echo "$source" > "publish/$path"
 
@@ -99,11 +103,6 @@ do
     posts_by_month["$year/$month"]+=" $filename"
     posts_by_day["$year/$month/$day"]+=" $filename"
 
-    for cat in "${categories[@]}"
-    do
-      all_categories["$cat"]+=" $filename"
-    done
-    
     for tag in "${tags[@]}"
     do
       all_tags["$tag"]+=" $filename"
@@ -112,7 +111,6 @@ do
 done
 
 unset tag_name
-unset category_name
 title="$blog_title"
 source "templates/index.sh"
 
@@ -127,14 +125,6 @@ do
   echo "$source" > "publish/posts/tags/$tag_name.html"
 done
 
-for category_name in "${!all_categories[@]}"
-do
-  category_posts="${all_categories[$category_name]}"
-  read -r -a posts <<< "$category_posts"
-
-  source "templates/index.sh"
-  echo "$source" > "publish/posts/categories/$category_name.html"
-done
 
 ################################################################################
 # Generate indices based on date                                               #
