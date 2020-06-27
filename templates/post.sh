@@ -4,7 +4,7 @@ set -o errexit  # stop on error
 set -o pipefail # stop on stupid 
 
 # DEBUGGING:
-# set -o xtrace 
+set -o xtrace 
 
 year=${date:0:4}
 date_string=$(date -d "$date" "+%B %d, %Y")
@@ -13,7 +13,7 @@ taglist=""
 for tag in "${tags[@]}"
 do
   tag=$(_htmlEscape "$tag")
-  taglist+="<li><a class=\"tag\" href=\"$base_url/posts/tags/$tag.html\">$tag</a></li>"
+  taglist+="<li><a class=\"tag\" href=\"$base_url/posts/tags/$tag.html\">#$tag</a></li>"
 done
 
 source="<!DOCTYPE html>
@@ -37,12 +37,10 @@ source="<!DOCTYPE html>
      <h2>$title</h2>
      <time datetime=\"$date\">$date_string</time>
      $content
-     <small>By $author</small>
      <ul class=\"tags\">$taglist</ul>
+     <small>- $author</small>
     </article>
   </main>
-
- <ul>$indexlist</ul>
 
   <footer>
     <small>Contents © $year, $author</small>

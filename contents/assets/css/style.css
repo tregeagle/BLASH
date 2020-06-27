@@ -69,12 +69,19 @@ article {
 }
 a {
   color: #797979;
+  text-decoration-line: none;
 }
 a:hover {
   color: #D9D9D9;
+  text-decoration-line: underline;
 }
 img {
   max-width: 100%;
+}
+
+
+time, small {
+  font-size: 0.7em;
 }
 
 .hidden {
@@ -124,6 +131,22 @@ nav li a {
 
 nav li a:hover {
   background-color: #292929;
+}
+
+ul.tags {
+  padding: 0;
+}
+
+.tags > li {
+  display: inline-block;
+  margin-right: 16px;
+  margin-left: 0;
+}
+
+.tags > li:after {
+}
+
+.tags  > li:last-of-type:after {
 }
 
 /* from base theme */

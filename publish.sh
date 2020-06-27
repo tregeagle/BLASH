@@ -3,8 +3,6 @@
 set -o errexit  # stop on error
 set -o pipefail # stop on stupid 
 
-# DEBUGGING:
-# set -o xtrace 
 
 
 #------------------------------------------------------------------------------#
@@ -24,8 +22,19 @@ _fileNameToUrl() {
   local day=${1:8:2}
   local slug=${1:11}
 
-  echo "posts/$year/$month/$day/$slug.html"
+  echo "posts/"${year}"/"${month}"/"${day}"/"${slug}".html"
 }
+
+_getMarkdownMeta() {
+metametavalue=`grep "\[\/\/\]: # ($1=" $2`
+if [ "${metametavalue}" != "" ]; then
+echo "${metametavalue}" | sed 's!\[\/\/\]: # ('$1'=!!; s!)!!' 
+else
+echo "No $1"
+fi
+}
+
+
 
 mkdir -p publish/posts
 mkdir -p publish/posts/tags
@@ -37,10 +46,10 @@ source "config.sh"
 
 configureAssets
 
-declare -a posts
+declare -a posts # make an array
 posts=()
 
-declare -A titles dates excerpts all_tags posts_by_year posts_by_month posts_by_day
+declare -A titles dates excerpts all_tags posts_by_year posts_by_month posts_by_day # make an associative array
 titles=()
 dates=()
 excerpts=()
@@ -51,10 +60,10 @@ posts_by_day=()
 
 current_year=$(date +%Y)
 
-post_list=(contents/posts/*.sh)
+post_list=(contents/posts/*.md) ##&& .sh
 post_list_rev=()
 
-# Reverse post list to get chronological order
+# Reverse post list/loop to get chronological order
 for (( i=${#post_list[@]}-1,j=0 ;i>=0;i--,j++ ))
 do
   post_list_rev[j]=${post_list[i]}
@@ -66,20 +75,25 @@ done
 for post in "${post_list_rev[@]}"
 do
   filename=$(basename -- "$post")
-  filename="${filename%.*}"
-
-  title=""
+  filename="${filename%.*}"  # sans extension
+  
+  title=$(_getMarkdownMeta "title" "contents/posts/$filename.md")
   author=$default_author
-  tags=()
+  #tags is not a proper array yet
+  tags=$(_getMarkdownMeta "tags" "contents/posts/$filename.md")
   draft=false
   excerpt=""
-  source "$post"
+  #source "$post" # line 1: [//]:: No such file
+  
+# DEBUGGING:
+set -o xtrace 
+
   title=$(_htmlEscape "$title")
   author=$(_htmlEscape "$author")
-  excerpt=$(_htmlEscape "$excerpt")
 
   date=${filename:0:10}
-  content=$(pandoc "contents/posts/$filename.md")
+  #mdcontent=$(sed '/^\[\/\/\]/d' contents/posts/$filename.md)
+  content=$(pandoc "$(sed '/^\[\/\/\]/d' contents/posts/$filename.md)")
   source "templates/post.sh"
 
   path=$(_fileNameToUrl "$filename")
@@ -90,7 +104,7 @@ do
   if [ "$draft" = false ] ; then
     posts+=("$filename")
     titles["$filename"]=$title
-    excerpts["$filename"]=$excerpt
+    #excerpts["$filename"]=$excerpt
     dates["$filename"]=$date
     
     year=${filename:0:4}

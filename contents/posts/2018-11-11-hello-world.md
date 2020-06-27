@@ -1,3 +1,4 @@
-# Hello world
+[//]: # (title=Hello world)
+[//]: # (tags=ta,gs)
 
-Hello
+So here we are.

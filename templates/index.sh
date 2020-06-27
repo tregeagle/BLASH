@@ -11,10 +11,10 @@ content=""
 for post in "${posts[@]}"
 do
   post_title=${titles[$post]}
-  excerpt=${excerpts[$post]}
+  #excerpt=${excerpts[$post]}
   date=${dates[$post]}
   url=$(_fileNameToUrl $post)
-  content+="<li>$date - <a href=\"$base_url/$url\">$post_title</a> &#126; <em>$excerpt</em></li>"
+  content+="<li>$date - <a href=\"$base_url/$url\">$post_title</a></li>"
 done
 
 subtitle=""
