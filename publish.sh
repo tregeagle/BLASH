@@ -77,6 +77,8 @@ do
   filename=$(basename -- "$post")
   filename="${filename%.*}"  # sans extension
   
+# DEBUGGING:
+set -o xtrace 
   title=$(_getMarkdownMeta "title" "contents/posts/$filename.md")
   author=$default_author
   #tags is not a proper array yet
@@ -85,15 +87,14 @@ do
   excerpt=""
   #source "$post" # line 1: [//]:: No such file
   
-# DEBUGGING:
-set -o xtrace 
 
   title=$(_htmlEscape "$title")
   author=$(_htmlEscape "$author")
 
   date=${filename:0:10}
-  #mdcontent=$(sed '/^\[\/\/\]/d' contents/posts/$filename.md)
-  content=$(pandoc "$(sed '/^\[\/\/\]/d' contents/posts/$filename.md)")
+  
+  content=$(pandoc "contents/posts/$filename.md")
+  
   source "templates/post.sh"
 
   path=$(_fileNameToUrl "$filename")
