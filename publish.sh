@@ -3,6 +3,8 @@
 set -o errexit  # stop on error
 set -o pipefail # stop on stupid 
 
+# DEBUGGING:
+#set -o xtrace 
 
 
 #------------------------------------------------------------------------------#
@@ -77,12 +79,13 @@ do
   filename=$(basename -- "$post")
   filename="${filename%.*}"  # sans extension
   
-# DEBUGGING:
-set -o xtrace 
-  title=$(_getMarkdownMeta "title" "contents/posts/$filename.md")
+
+  title=$(_getMarkdownMeta "title" "contents/posts/${filename}.md")
   author=$default_author
   #tags is not a proper array yet
-  tags=$(_getMarkdownMeta "tags" "contents/posts/$filename.md")
+  declare -a tags
+  tags1=$(_getMarkdownMeta "tags" "contents/posts/${filename}.md")
+  tags=(${tags1})
   draft=false
   excerpt=""
   #source "$post" # line 1: [//]:: No such file
